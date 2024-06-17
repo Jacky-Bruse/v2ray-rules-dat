@@ -24,3 +24,5 @@ gemini.google.com
 generativeai.google
 proactivebackend-pa.googleapis.com
 apis.google.com
+proxmox.com
+download.proxmox.com
