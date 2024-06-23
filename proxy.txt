@@ -26,3 +26,4 @@ proactivebackend-pa.googleapis.com
 apis.google.com
 proxmox.com
 download.proxmox.com
+kp.m-team.cc
