@@ -27,3 +27,11 @@ apis.google.com
 proxmox.com
 download.proxmox.com
 kp.m-team.cc
+livednow.com
+orz-7.com
+4gtv.tv
+hinet.net
+ofiii.com
+googlevideo.com
+youtube.com
+mytvsuper.com
