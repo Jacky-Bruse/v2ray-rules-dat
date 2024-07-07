@@ -31,6 +31,9 @@ jobs:
           echo "WIN_EXTRA=https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/extra.txt" >> $GITHUB_ENV
           # 新增的规则集URL变量 
           echo "LIMBO_ADBLOCK_RULES_URL=https://raw.githubusercontent.com/limbopro/Adblock4limbo/main/rule/Surge/Adblock4limbo_surge.list" >> $GITHUB_ENV
+          echo "LIMBO_ADBLOCK_RULES2_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easylist_surge.list" >> $GITHUB_ENV
+          echo "LIMBO_ADBLOCK_RULES3_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easyprivacy_surge.list" >> $GITHUB_ENV
+          echo "LIMBO_ADBLOCK_RULES4_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easylistchina_surge.list" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout the "hidden" branch of this repo
@@ -91,11 +94,23 @@ jobs:
           curl -sSL $ADGUARD_DNS_REJECT_URL | perl -ne '/^\|\|([-_0-9a-zA-Z]+(\.[-_0-9a-zA-Z]+){1,64})\^$/ && print "$1\n"' | perl -ne 'print if not /^[0-9]{1,3}(\.[0-9]{1,3}){3}$/' >> temp-reject.txt
           curl -sSL $PETERLOWE_REJECT_URL | perl -ne '/^127\.0\.0\.1\s([-_0-9a-zA-Z]+(\.[-_0-9a-zA-Z]+){1,64})$/ && print "$1\n"' >> temp-reject.txt
           curl -sSL $DANPOLLOCK_REJECT_URL | perl -ne '/^127\.0\.0\.1\s([-_0-9a-zA-Z]+(\.[-_0-9a-zA-Z]+){1,64})/ && print "$1\n"' | sed '1d' >> temp-reject.txt
-           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行 
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
           curl -sSL ${LIMBO_ADBLOCK_RULES_URL} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_adblock_rules_domains.tmp
           cat limbo_adblock_rules_domains.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted.tmp
           cat limbo_adblock_rules_domains_sorted.tmp >> temp-reject.txt  # 注意这里使用>>而不是>
-
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${LIMBO_ADBLOCK_RULES_URL2} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_adblock_rules_domains2.tmp
+          cat limbo_adblock_rules_domains2.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted2.tmp
+          cat limbo_adblock_rules_domains_sorted2.tmp >> temp-reject.txt  # 注意这里使用>>而不是>          
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${LIMBO_ADBLOCK_RULES_URL3} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_adblock_rules_domains3.tmp
+          cat limbo_adblock_rules_domains3.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted3.tmp
+          cat limbo_adblock_rules_domains_sorted3.tmp >> temp-reject.txt  # 注意这里使用>>而不是>
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${LIMBO_ADBLOCK_RULES_URL4} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_adblock_rules_domains4.tmp
+          cat limbo_adblock_rules_domains4.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted4.tmp
+          cat limbo_adblock_rules_domains_sorted4.tmp >> temp-reject.txt  # 注意这里使用>>而不是>          
+          
       - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         run: |
           curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | sort --ignore-case -u > direct-reserve.txt
