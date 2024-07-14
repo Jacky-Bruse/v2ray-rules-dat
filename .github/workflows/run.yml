@@ -34,6 +34,7 @@ jobs:
           echo "LIMBO_ADBLOCK_RULES2_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easylist_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES3_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easyprivacy_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES4_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easylistchina_surge.list" >> $GITHUB_ENV
+          echo "LIMBO_ADBLOCK_RULES5_URL=https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout the "hidden" branch of this repo
@@ -110,6 +111,10 @@ jobs:
           curl -sSL ${LIMBO_ADBLOCK_RULES_URL4} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_adblock_rules_domains4.tmp
           cat limbo_adblock_rules_domains4.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted4.tmp
           cat limbo_adblock_rules_domains_sorted4.tmp >> temp-reject.txt  # 注意这里使用>>而不是>          
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${LIMBO_ADBLOCK_RULES_URL5} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_adblock_rules_domains5.tmp
+          cat limbo_adblock_rules_domains5.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted5.tmp
+          cat limbo_adblock_rules_domains_sorted5.tmp >> temp-reject.txt  # 注意这里使用>>而不是>    
           
       - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         run: |
