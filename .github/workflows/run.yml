@@ -37,8 +37,10 @@ jobs:
           echo "LIMBO_ADBLOCK_RULES5_URL=https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt" >> $GITHUB_ENV
           # 新增直连
           echo "CHINA_DOMAINS_URL1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
+          echo "CHINA_DOMAINS_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
           # 新增代理
-          echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV        
+          echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV
+          echo "CUSTOM_PROXY2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/GlobalMedia/GlobalMedia.list" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout the "hidden" branch of this repo
@@ -89,6 +91,10 @@ jobs:
           curl -sSL ${CHINA_DOMAINS_URL1} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_china_domains1.tmp
           cat limbo_china_domains1.tmp | sort --ignore-case -u > limbo_china_domains_sorted1.tmp
           cat limbo_china_domains_sorted1.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${CHINA_DOMAINS_URL2} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_china_domains2.tmp
+          cat limbo_china_domains2.tmp | sort --ignore-case -u > limbo_china_domains_sorted2.tmp
+          cat limbo_china_domains_sorted2.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
 
       - name: Get and add proxy domains into temp-proxy.txt file
         run: |
@@ -100,6 +106,10 @@ jobs:
           curl -sSL ${CUSTOM_PROXY1} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_proxy_domains1.tmp
           cat limbo_proxy_domains1.tmp | sort --ignore-case -u > limbo_proxy_domains_sorted1.tmp
           cat limbo_proxy_domains_sorted1.tmp >> temp-proxy.txt  # 注意这里使用>>而不是>
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${CUSTOM_PROXY2} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_proxy_domains2.tmp
+          cat limbo_proxy_domains2.tmp | sort --ignore-case -u > limbo_proxy_domains_sorted2.tmp
+          cat limbo_proxy_domains_sorted2.tmp >> temp-proxy.txt  # 注意这里使用>>而不是>
 
       - name: Get and add reject domains into temp-reject.txt file
         run: |
