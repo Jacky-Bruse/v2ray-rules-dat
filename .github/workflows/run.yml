@@ -35,9 +35,6 @@ jobs:
           echo "LIMBO_ADBLOCK_RULES3_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easyprivacy_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES4_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easylistchina_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES5_URL=https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt" >> $GITHUB_ENV
-          echo "ADGUARD_BASE_FILTER_URL=https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter.txt" >> $GITHUB_ENV
-          echo "ADGUARD_BASE_FILTER_URL2=https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter.txt" >> $GITHUB_ENV
-          echo "CJX_ANNOYANCE_URL=https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-annoyance.txt" >> $GITHUB_ENV          
           # 新增直连
           echo "CHINA_DOMAINS_URL1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
           echo "CHINA_DOMAINS_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
@@ -140,18 +137,6 @@ jobs:
           curl -sSL ${LIMBO_ADBLOCK_RULES_URL5} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_adblock_rules_domains5.tmp
           cat limbo_adblock_rules_domains5.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted5.tmp
           cat limbo_adblock_rules_domains_sorted5.tmp >> temp-reject.txt  # 注意这里使用>>而不是>    
-           # 新增对 ADGUARD_BASE_FILTER_URL 的处理，以下三行为一组 
-          curl -sSL ${ADGUARD_BASE_FILTER_URL} | grep "^||" | cut -d'^' -f2 > adguard_base_filter_domains.tmp 
-          cat adguard_base_filter_domains.tmp | sort --ignore-case -u > adguard_base_filter_domains_sorted.tmp 
-          cat adguard_base_filter_domains_sorted.tmp >> temp-reject.txt # 注意这里使用>>而不是>
-           # 新增对 ADGUARD_BASE_FILTER_URL 的处理，以下三行为一组 
-          curl -sSL ${ADGUARD_BASE_FILTER_URL2} | grep "^||" | cut -d'^' -f2 > adguard_base_filter_domains2.tmp 
-          cat adguard_base_filter_domains2.tmp | sort --ignore-case -u > adguard_base_filter_domains_sorted2.tmp 
-          cat adguard_base_filter_domains_sorted2.tmp >> temp-reject.txt # 注意这里使用>>而不是>
-           # 新增对 CJX_ANNOYANCE_URL 的处理，以下三行为一组 
-          curl -sSL ${CJX_ANNOYANCE_URL} | grep "^||" | sed 's/^||//' > cjx_annoyance_domains.tmp
-          cat cjx_annoyance_domains.tmp | sort --ignore-case -u > cjx_annoyance_domains_sorted.tmp
-          cat cjx_annoyance_domains_sorted.tmp >> temp-reject.txt # 注意这里使用>>而不是>
           
       - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         run: |
