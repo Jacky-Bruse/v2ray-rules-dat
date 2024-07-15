@@ -29,12 +29,16 @@ jobs:
           echo "WIN_SPY=https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt" >> $GITHUB_ENV
           echo "WIN_UPDATE=https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/update.txt" >> $GITHUB_ENV
           echo "WIN_EXTRA=https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/extra.txt" >> $GITHUB_ENV
-          # 新增的规则集URL变量 
+          # 新增的广告规则集URL变量 
           echo "LIMBO_ADBLOCK_RULES_URL=https://raw.githubusercontent.com/limbopro/Adblock4limbo/main/rule/Surge/Adblock4limbo_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES2_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easylist_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES3_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easyprivacy_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES4_URL=https://github.com/limbopro/Adblock4limbo/raw/main/rule/Surge/easylistchina_surge.list" >> $GITHUB_ENV
           echo "LIMBO_ADBLOCK_RULES5_URL=https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt" >> $GITHUB_ENV
+          # 新增直连
+          echo "CHINA_DOMAINS_URL1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
+          # 新增代理
+          echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV        
         shell: bash
 
       - name: Checkout the "hidden" branch of this repo
@@ -81,6 +85,10 @@ jobs:
         run: |
           curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > temp-direct.txt
           curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-direct.txt
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${CHINA_DOMAINS_URL1} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_china_domains1.tmp
+          cat limbo_china_domains1.tmp | sort --ignore-case -u > limbo_china_domains_sorted1.tmp
+          cat limbo_china_domains_sorted1.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
 
       - name: Get and add proxy domains into temp-proxy.txt file
         run: |
@@ -88,6 +96,10 @@ jobs:
           curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
           curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
           curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-proxy.txt
+           # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
+          curl -sSL ${CUSTOM_PROXY1} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_proxy_domains1.tmp
+          cat limbo_proxy_domains1.tmp | sort --ignore-case -u > limbo_proxy_domains_sorted1.tmp
+          cat limbo_proxy_domains_sorted1.tmp >> temp-proxy.txt  # 注意这里使用>>而不是>
 
       - name: Get and add reject domains into temp-reject.txt file
         run: |
