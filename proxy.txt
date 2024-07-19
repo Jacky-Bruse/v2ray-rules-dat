@@ -45,3 +45,5 @@ k.gjacky.com
 modules-cloudflare.lsposed.org
 community.oneplus.com
 groq.com
+ipgeolocation.io
+api.ipgeolocation.io
