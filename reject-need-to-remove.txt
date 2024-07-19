@@ -32,3 +32,5 @@ tongji.baidu.com
 tv.sohu.com
 ue.yeyoucdn.com
 wl.spotify.com
+api.ipgeolocation.io
+ipgeolocation.io
