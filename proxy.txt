@@ -47,3 +47,9 @@ community.oneplus.com
 groq.com
 ipgeolocation.io
 api.ipgeolocation.io
+adjust.world
+adjust.net.in
+intlgame.com
+tdatamaster.com
+iegcom.com
+asia.ngame.proximabeta.com
