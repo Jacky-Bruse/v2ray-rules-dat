@@ -34,3 +34,5 @@ ue.yeyoucdn.com
 wl.spotify.com
 api.ipgeolocation.io
 ipgeolocation.io
+dataservice.accuweather.com
+accuweather.com
