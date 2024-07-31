@@ -40,7 +40,7 @@ jobs:
 
           # 新增直连
           echo "CHINA_DOMAINS_URL1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
-          echo "CHINA_DOMAINS_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
+          # echo "CHINA_DOMAINS_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
           # 新增代理
           echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV
           echo "CUSTOM_PROXY2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/GlobalMedia/GlobalMedia.list" >> $GITHUB_ENV
