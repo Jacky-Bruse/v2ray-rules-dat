@@ -36,3 +36,4 @@ api.ipgeolocation.io
 ipgeolocation.io
 dataservice.accuweather.com
 accuweather.com
+update.googleapis.com
