@@ -75,11 +75,6 @@ jobs:
         with:
           go-version-file: ./custom/go.mod
           cache-dependency-path: ./custom/go.sum
-
-      - name: Create fake-ip-filter directory and download fake IP filter list 
-        run: |
-          mkdir -p ./community/data/fake-ip-filter 
-          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
           
       - name: Get geoip.dat relative files
         run: |
@@ -229,6 +224,7 @@ jobs:
           curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > win-update.txt
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-extra
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > win-extra.txt
+          curl -sSL $FAKE_IP_FILTER_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
 
       - name: Build geosite.dat file
         run: |
