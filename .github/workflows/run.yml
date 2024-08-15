@@ -84,7 +84,7 @@ jobs:
       # 新增FakeIPFilter
       - name: Get and add fake-ip-filter domains into temp-fake-ip-filter.txt file
         run: |
-          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
+          curl -sSL $FAKE_IP_FILTER_URL | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
           cat fake_ip_filter.tmp | sort --ignore-case -u > fake_ip_filter_sorted.tmp
           cat fake_ip_filter_sorted.tmp >> fake-ip-filter.txt  # 注意这里使用>>而不是>
           curl -sSL $FAKE_IP_FILTER_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
