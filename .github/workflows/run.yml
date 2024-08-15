@@ -81,6 +81,14 @@ jobs:
           wget https://github.com/Loyalsoldier/geoip/raw/release/geoip.dat
           wget https://github.com/Loyalsoldier/geoip/raw/release/geoip.dat.sha256sum
 
+      # 新增FakeIPFilter
+      - name: Get and add fake-ip-filter domains into temp-fake-ip-filter.txt file
+        run: |
+          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
+          cat fake_ip_filter.tmp | sort --ignore-case -u > fake_ip_filter_sorted.tmp
+          cat fake_ip_filter_sorted.tmp >> fake-ip-filter.txt  # 注意这里使用>>而不是>
+          curl -sSL $FAKE_IP_FILTER_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
+
       - name: Generate GFWList domains
         run: |
           cd gfwlist2dnsmasq || exit 1
@@ -224,8 +232,6 @@ jobs:
           curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > win-update.txt
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-extra
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > win-extra.txt
-          curl -sSL $FAKE_IP_FILTER_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
-
 
       - name: Build geosite.dat file
         run: |
