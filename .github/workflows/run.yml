@@ -44,7 +44,7 @@ jobs:
           echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV
           echo "CUSTOM_PROXY2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/GlobalMedia/GlobalMedia.list" >> $GITHUB_ENV
           # 新增fake-ip-filter
-          echo "fake-ip-filter_URL=https://raw.githubusercontent.com/juewuy/ShellCrash/dev/public/fake_ip_filter.list" >> $GITHUB_ENV
+          echo "fake_ip_filter_URL=https://raw.githubusercontent.com/juewuy/ShellCrash/dev/public/fake_ip_filter.list" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout the "hidden" branch of this repo
@@ -90,7 +90,7 @@ jobs:
       # 新增FakeIPFilter
       - name: Get and add fake-ip-filter domains into temp-fake-ip-filter.txt file
         run: |
-          curl -sSL $fake-ip-filter_URL | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
+          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
           cat fake_ip_filter.tmp | sort --ignore-case -u > fake_ip_filter_sorted.tmp
           cat fake_ip_filter_sorted.tmp >> fake-ip-filter.txt  # 注意这里使用>>而不是>
 
