@@ -160,7 +160,8 @@ jobs:
           cat proxy.txt >> temp-proxy.txt
           cat direct.txt >> temp-direct.txt
           cat reject.txt >> temp-reject.txt
-
+          cat fake-ip-filter.txt >> temp-fakeip.txt
+          
       - name: Sort and generate redundant lists
         run: |
           cat temp-proxy.txt | sort --ignore-case -u > proxy-list-with-redundant
@@ -231,7 +232,8 @@ jobs:
           curl -sSL $FAKE_IP_FILTER_URL | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > fake_ip_filter.tmp
           cat fake_ip_filter.tmp | sort --ignore-case -u > fake_ip_filter_sorted.tmp
           cat fake_ip_filter_sorted.tmp >> fake-ip-filter.txt  # 注意这里使用>>而不是>
-          curl -sSL $FAKE_IP_FILTER_URL | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > ./community/data/fake-ip-filter
+          cat temp-fakeip.txt >> fake-ip-filter.txt  # 注意这里使用>>而不是>
+          [ -f "fake-ip-filter.txt" ] && cat fake-ip-filter.txt > ./community/data/fake-ip-filter
 
       - name: Build geosite.dat file
         run: |
