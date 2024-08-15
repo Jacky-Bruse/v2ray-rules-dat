@@ -37,13 +37,14 @@ jobs:
           echo "LIMBO_ADBLOCK_RULES5_URL=https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt" >> $GITHUB_ENV
           echo "Privacy_RULES5_URL=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Privacy/Privacy.list" >> $GITHUB_ENV
           echo "Privacy_RULES5_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Advertising/Advertising.list" >> $GITHUB_ENV
-
           # 新增直连
           echo "CHINA_DOMAINS_URL1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
           # echo "CHINA_DOMAINS_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
           # 新增代理
           echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV
           echo "CUSTOM_PROXY2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/GlobalMedia/GlobalMedia.list" >> $GITHUB_ENV
+          # 新增fake-ip-filter
+          echo "fake-ip-filter_URL=https://raw.githubusercontent.com/juewuy/ShellCrash/dev/public/fake_ip_filter.list" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout the "hidden" branch of this repo
@@ -85,6 +86,13 @@ jobs:
           cd gfwlist2dnsmasq || exit 1
           chmod +x ./gfwlist2dnsmasq.sh
           ./gfwlist2dnsmasq.sh -l -o ./temp-gfwlist.txt
+
+      # 新增FakeIPFilter
+      - name: Get and add fake-ip-filter domains into temp-fake-ip-filter.txt file
+        run: |
+          curl -sSL $fake-ip-filter_URL | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
+          cat fake_ip_filter.tmp | sort --ignore-case -u > fake_ip_filter_sorted.tmp
+          cat fake_ip_filter_sorted.tmp >> fake-ip-filter.txt  # 注意这里使用>>而不是>
 
       - name: Get and add direct domains into temp-direct.txt file
         run: |
@@ -236,7 +244,7 @@ jobs:
           install -Dp ./custom/publish/geosite.dat ./publish/geosite.dat
           install -p {proxy,direct,reject}-tld-list.txt ./publish/
           install -p {proxy,direct,reject}-list.txt ./publish/
-          install -p {china-list,apple-cn,google-cn,gfw,greatfire,win-spy,win-update,win-extra}.txt ./publish/
+          install -p {china-list,apple-cn,google-cn,gfw,greatfire,win-spy,win-update,win-extra,fake-ip-filter}.txt ./publish/
           cd ./publish || exit 1
           zip rules.zip {proxy,direct,reject}-list.txt geoip.dat geosite.dat
           sha256sum geosite.dat > geosite.dat.sha256sum
