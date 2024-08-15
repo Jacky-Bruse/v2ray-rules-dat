@@ -44,7 +44,7 @@ jobs:
           echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV
           echo "CUSTOM_PROXY2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/GlobalMedia/GlobalMedia.list" >> $GITHUB_ENV
           # 新增fake-ip-filter
-          echo "fake_ip_filter_URL=https://raw.githubusercontent.com/juewuy/ShellCrash/dev/public/fake_ip_filter.list" >> $GITHUB_ENV
+          echo "FAKE_IP_FILTER_URL=https://raw.githubusercontent.com/juewuy/ShellCrash/dev/public/fake_ip_filter.list" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout the "hidden" branch of this repo
@@ -207,7 +207,7 @@ jobs:
           cp ./community/data/geolocation-\!cn proxy-list.txt
           cp ./community/data/category-ads-all reject-list.txt
 
-      - name: Create `china-list`、`google-cn`、`apple-cn`、`gfw`、`greatfire` lists
+      - name: Create `china-list`、`google-cn`、`apple-cn`、`gfw`、`greatfire` 、`fake-ip-filter`lists
         run: |
           curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > ./community/data/china-list
           curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > china-list.txt
@@ -224,9 +224,8 @@ jobs:
           curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > win-update.txt
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-extra
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > win-extra.txt
-          # 加入Fake_IP
-          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
-          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > fake-ip-filter.txt
+          curl -sSL $FAKE_IP_FILTER_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
+          curl -sSL $FAKE_IP_FILTER_URL | grep -v '^#' | grep -v '^$' > fake-ip-filter.txt
 
       - name: Build geosite.dat file
         run: |
