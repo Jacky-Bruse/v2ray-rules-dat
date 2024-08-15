@@ -87,13 +87,6 @@ jobs:
           chmod +x ./gfwlist2dnsmasq.sh
           ./gfwlist2dnsmasq.sh -l -o ./temp-gfwlist.txt
 
-      # 新增FakeIPFilter
-      - name: Get and add fake-ip-filter domains into temp-fake-ip-filter.txt file
-        run: |
-          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
-          cat fake_ip_filter.tmp | sort --ignore-case -u > fake_ip_filter_sorted.tmp
-          cat fake_ip_filter_sorted.tmp >> fake-ip-filter.txt  # 注意这里使用>>而不是>
-
       - name: Get and add direct domains into temp-direct.txt file
         run: |
           curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > temp-direct.txt
@@ -231,6 +224,9 @@ jobs:
           curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > win-update.txt
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-extra
           curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > win-extra.txt
+          # 加入Fake_IP
+          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > ./community/data/fake-ip-filter
+          curl -sSL $fake_ip_filter_URL | grep -v '^#' | grep -v '^$' > fake-ip-filter.txt
 
       - name: Build geosite.dat file
         run: |
