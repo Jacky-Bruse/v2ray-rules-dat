@@ -127,7 +127,8 @@ jobs:
           cat anti_ad.tmp | sort --ignore-case -u > anti_ad_sorted.tmp
           cat anti_ad_sorted.tmp >> temp-reject.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL $LIMBO_ADBLOCK_RULES_URL2 | sed -n -e 's/^- DOMAIN,/full:/' -e 's/^- DOMAIN-SUFFIX,//' -e 's/^- DOMAIN-KEYWORD,/keyword:/' -e 's/^- DOMAIN-REGEX,/regexp:/' > limbo_adblock_rules_domains2.tmp          cat limbo_adblock_rules_domains2.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted2.tmp
+          curl -sSL $LIMBO_ADBLOCK_RULES_URL2 | sed -n -e 's/^  - DOMAIN,/full:/' -e 's/^  - DOMAIN-SUFFIX,//' -e 's/^- DOMAIN-REGEX,/regexp:/' > limbo_adblock_rules_domains2.tmpp          
+          cat limbo_adblock_rules_domains2.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted2.tmp
           cat limbo_adblock_rules_domains_sorted2.tmp >> temp-reject.txt  # 注意这里使用>>而不是>          
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
           curl -sSL ${anti_AD_URL2} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > anti_ad.tmp
