@@ -126,7 +126,7 @@ jobs:
           cat anti_ad.tmp | sort --ignore-case -u > anti_ad_sorted.tmp
           cat anti_ad_sorted.tmp >> temp-reject.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${LIMBO_ADBLOCK_RULES2_URL} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\.//" -e "s/^- '/full:/" | sort --ignore-case > limbo_adblock_rules_domains2.tmp
+          curl -sSL ${LIMBO_ADBLOCK_RULES2_URL} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\.//" -e "s/^- '//" | sort --ignore-case > limbo_adblock_rules_domains2.tmp
           cat limbo_adblock_rules_domains2.tmp | sort --ignore-case -u > limbo_adblock_rules_domains_sorted2.tmp
           cat limbo_adblock_rules_domains_sorted2.tmp >> temp-reject.txt  # 注意这里使用>>而不是>          
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
