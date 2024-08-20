@@ -92,11 +92,11 @@ jobs:
           curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > temp-direct.txt
           curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-direct.txt
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${CHINA_DOMAINS_URL1} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_china_domains1.tmp
+          curl -sSL ${CHINA_DOMAINS_URL1} | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > limbo_china_domains1.tmp
           cat limbo_china_domains1.tmp | sort --ignore-case -u > limbo_china_domains_sorted1.tmp
           cat limbo_china_domains_sorted1.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${CHINA_DOMAINS_URL2} | grep "^DOMAIN-SUFFIX," | cut -d',' -f2 > limbo_china_domains2.tmp
+          curl -sSL ${CHINA_DOMAINS_URL2} | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > limbo_china_domains2.tmp
           cat limbo_china_domains2.tmp | sort --ignore-case -u > limbo_china_domains_sorted2.tmp
           cat limbo_china_domains_sorted2.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
 
