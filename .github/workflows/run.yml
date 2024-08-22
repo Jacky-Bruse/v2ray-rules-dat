@@ -39,7 +39,7 @@ jobs:
           # echo "Privacy_RULES5_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Advertising/Advertising.list" >> $GITHUB_ENV
           # 新增直连
           echo "CHINA_DOMAINS_URL1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
-          # echo "CHINA_DOMAINS_URL2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
+          echo "CHINA_DOMAINS_URL2=https://gist.githubusercontent.com/cnfree8964/0864fd1d2e88936a095fb40d74ce4993/raw/collection.yaml" >> $GITHUB_ENV
           # 新增代理
           echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV
           echo "CUSTOM_PROXY2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/GlobalMedia/GlobalMedia.list" >> $GITHUB_ENV
@@ -96,7 +96,8 @@ jobs:
           cat limbo_china_domains1.tmp | sort --ignore-case -u > limbo_china_domains_sorted1.tmp
           cat limbo_china_domains_sorted1.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${CHINA_DOMAINS_URL2} | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > limbo_china_domains2.tmp
+          # curl -sSL ${CHINA_DOMAINS_URL2} | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > limbo_china_domains2.tmp
+          curl -sSL ${CHINA_DOMAINS_URL2} | sed -n 's/^[[:space:]]*-[[:space:]]*DOMAIN,/full:/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX,//p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD,/keyword:/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX,/regexp:/p' > limbo_china_domains2.tmp
           cat limbo_china_domains2.tmp | sort --ignore-case -u > limbo_china_domains_sorted2.tmp
           cat limbo_china_domains_sorted2.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
 
