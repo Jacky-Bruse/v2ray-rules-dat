@@ -58,3 +58,4 @@ dataservice.accuweather.com
 linux.do
 metacubex.one
 dmit.io
+ptchdbits.co
