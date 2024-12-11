@@ -26,7 +26,6 @@ proactivebackend-pa.googleapis.com
 apis.google.com
 proxmox.com
 download.proxmox.com
-kp.m-team.cc
 livednow.com
 orz-7.com
 4gtv.tv
@@ -58,4 +57,3 @@ dataservice.accuweather.com
 linux.do
 metacubex.one
 dmit.io
-ptchdbits.co
