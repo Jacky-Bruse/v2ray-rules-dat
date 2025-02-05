@@ -190,6 +190,8 @@ upos-hz-mirrorakam.akamaized.net
 uposdash-302-bilivideo.yfcdn.net
 95599.cn
 abchina.com
+
+lovelyxixi.com
 bscabank.com
 openaboc.cn
 openaboc.com
@@ -219,3 +221,4 @@ tracker.ptchdbits.co
 tracker.m-team.cc
 v6tracker.m-team.io
 tracker.m-team.io
+myip.ipip.net
