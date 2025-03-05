@@ -115,8 +115,14 @@ jobs:
 
       - name: Get and add reject domains into temp-reject.txt file
         run: |
+          # Create empty files at the beginning
           touch temp-reject.txt
-          
+          touch reject-tld-list.txt
+          touch reject-list.txt
+          touch reject-reserve.txt
+          touch fake-ip-filter.txt
+          touch temp-fakeip.txt
+
       - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         run: |
           curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | sort --ignore-case -u > direct-reserve.txt
@@ -159,12 +165,19 @@ jobs:
 
       - name: Write lists to data directory
         run: |
+          # Ensure directories exist
+          mkdir -p ./community/data
+          
           cat temp-cn.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/cn
           cat temp-cn.txt | sort --ignore-case -u | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > direct-tld-list.txt
           cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/geolocation-\!cn
           cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > proxy-tld-list.txt
           cat temp-category-ads-all.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/category-ads-all
           cat temp-category-ads-all.txt | sort --ignore-case -u | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > reject-tld-list.txt
+          
+          # Ensure files exist and are not empty
+          [ ! -s reject-tld-list.txt ] && echo "# Empty reject-tld list" > reject-tld-list.txt
+          [ ! -s reject-list.txt ] && echo "# Empty reject list" > reject-list.txt
 
       - name: Add `full`, `regexp` and `keyword` type of rules back into "cn", "geolocation-!cn" and "category-ads-all" list
         run: |
@@ -391,15 +404,9 @@ jobs:
           asset_name: proxy-tld-list.txt
           asset_content_type: text/plain
 
-      - name: Create empty files if not exist
-        run: |
-          touch reject-tld-list.txt
-          touch reject-list.txt
-          touch reject-reserve.txt
-
       - name: Upload reject-tld-list.txt
         uses: actions/upload-release-asset@v1
-        if: hashFiles('reject-tld-list.txt') != ''
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
