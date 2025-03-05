@@ -423,5 +423,6 @@ jobs:
           git checkout -b release
           git add geoip.dat geosite.dat geoip.dat.sha256sum geosite.dat.sha256sum china-list.txt google-cn.txt apple-cn.txt gfw.txt greatfire.txt win-spy.txt win-update.txt win-extra.txt direct-list.txt proxy-list.txt reject-list.txt direct-tld-list.txt proxy-tld-list.txt reject-tld-list.txt || true
           git commit -m "${{ env.RELEASE_NAME }}" || true
+          git remote remove origin || true
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f origin release || true
