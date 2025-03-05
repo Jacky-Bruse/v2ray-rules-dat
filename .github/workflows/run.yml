@@ -205,7 +205,7 @@ jobs:
       - name: Build geosite.dat file
         run: |
           cd custom || exit 1
-          go run ./ --datapath=../community/data --outputname=../geosite.dat
+          go run ./ --datapath=../community/data --outputpath=../ --datname=geosite.dat
           cd ..
           sha256sum geosite.dat > geosite.dat.sha256sum
 
