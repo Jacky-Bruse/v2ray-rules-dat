@@ -116,7 +116,7 @@ jobs:
       - name: Get and add reject domains into temp-reject.txt file
         run: |
           touch temp-reject.txt
-
+          
       - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         run: |
           curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | sort --ignore-case -u > direct-reserve.txt
@@ -362,6 +362,7 @@ jobs:
 
       - name: Upload reject-list.txt
         uses: actions/upload-release-asset@v1
+        if: hashFiles('reject-list.txt') != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -390,8 +391,15 @@ jobs:
           asset_name: proxy-tld-list.txt
           asset_content_type: text/plain
 
+      - name: Create empty files if not exist
+        run: |
+          touch reject-tld-list.txt
+          touch reject-list.txt
+          touch reject-reserve.txt
+
       - name: Upload reject-tld-list.txt
         uses: actions/upload-release-asset@v1
+        if: hashFiles('reject-tld-list.txt') != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -406,7 +414,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git init
           git checkout -b release
-          git add geoip.dat geosite.dat geoip.dat.sha256sum geosite.dat.sha256sum china-list.txt google-cn.txt apple-cn.txt gfw.txt greatfire.txt win-spy.txt win-update.txt win-extra.txt direct-list.txt proxy-list.txt reject-list.txt direct-tld-list.txt proxy-tld-list.txt reject-tld-list.txt
-          git commit -m "${{ env.RELEASE_NAME }}"
+          git add geoip.dat geosite.dat geoip.dat.sha256sum geosite.dat.sha256sum china-list.txt google-cn.txt apple-cn.txt gfw.txt greatfire.txt win-spy.txt win-update.txt win-extra.txt direct-list.txt proxy-list.txt reject-list.txt direct-tld-list.txt proxy-tld-list.txt reject-tld-list.txt || true
+          git commit -m "${{ env.RELEASE_NAME }}" || true
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
-          git push -f origin release
+          git push -f origin release || true
