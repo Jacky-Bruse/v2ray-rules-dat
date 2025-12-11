@@ -63,10 +63,10 @@ mail.xixihub.com
 gauss-componentotacostmanual-eu.allawnofs.com
 connectivitycheck.gstatic.com
 paly-fe.googleapis.com
-google.com
 googleapis.com
 googleusercontent.com
 gvt1.com
 gvt2.com
 gvt3.com
 dl.google.com
+
