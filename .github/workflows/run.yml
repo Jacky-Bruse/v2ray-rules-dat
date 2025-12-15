@@ -26,8 +26,8 @@ jobs:
           echo "WIN_UPDATE=https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/update.txt" >> $GITHUB_ENV
           echo "WIN_EXTRA=https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/extra.txt" >> $GITHUB_ENV
           # 新增直连
-          echo "CHINA_DOMAINS_URL1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
-          echo "CHINA_DOMAINS_URL2=https://gist.githubusercontent.com/cnfree8964/0864fd1d2e88936a095fb40d74ce4993/raw/collection.yaml" >> $GITHUB_ENV
+          echo "CHINA_DOMAINS_URL1=https://github.com/Accademia/Additional_Rule_For_Clash/raw/refs/heads/main/China/China.yaml" >> $GITHUB_ENV
+          # echo "CHINA_DOMAINS_URL2=https://gist.githubusercontent.com/cnfree8964/0864fd1d2e88936a095fb40d74ce4993/raw/collection.yaml" >> $GITHUB_ENV
           echo "CHINA_DOMAINS_URL3=https://github.com/Sfssup/MihomoConfigFile/raw/refs/heads/main/rule_set/direct.yaml" >> $GITHUB_ENV
           echo "CHINA_DOMAINS_URL4=https://github.com/Sfssup/MihomoConfigFile/raw/refs/heads/main/rule_set/tvbox.yaml" >> $GITHUB_ENV
           # 新增代理
@@ -82,13 +82,13 @@ jobs:
           curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > temp-direct.txt
           curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-direct.txt
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${CHINA_DOMAINS_URL1} | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > limbo_china_domains1.tmp
+          curl -sSL ${CHINA_DOMAINS_URL1} | grep -v '#' | sed -n 's/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/keyword:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/regexp:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/full:\1/p' > limbo_china_domains1.tmp
           cat limbo_china_domains1.tmp | sort --ignore-case -u > limbo_china_domains_sorted1.tmp
           cat limbo_china_domains_sorted1.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${CHINA_DOMAINS_URL2} | sed -n 's/^[[:space:]]*-[[:space:]]*DOMAIN,/full:/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX,//p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD,/keyword:/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX,/regexp:/p' > limbo_china_domains2.tmp
-          cat limbo_china_domains2.tmp | sort --ignore-case -u > limbo_china_domains_sorted2.tmp
-          cat limbo_china_domains_sorted2.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
+          # curl -sSL ${CHINA_DOMAINS_URL2} | sed -n 's/^[[:space:]]*-[[:space:]]*DOMAIN,/full:/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX,//p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD,/keyword:/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX,/regexp:/p' > limbo_china_domains2.tmp
+          # cat limbo_china_domains2.tmp | sort --ignore-case -u > limbo_china_domains_sorted2.tmp
+          # cat limbo_china_domains_sorted2.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
           curl -sSL ${CHINA_DOMAINS_URL3} | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > limbo_china_domains3.tmp
           cat limbo_china_domains3.tmp | sort --ignore-case -u > limbo_china_domains_sorted3.tmp
