@@ -411,13 +411,23 @@ jobs:
           asset_name: reject-tld-list.txt
           asset_content_type: text/plain
 
+      - name: Upload fake-ip-filter.txt
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./fake-ip-filter.txt
+          asset_name: fake-ip-filter.txt
+          asset_content_type: text/plain
+
       - name: Git push assets to "release" branch
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git init
           git checkout -b release
-          git add geoip.dat geosite.dat geoip.dat.sha256sum geosite.dat.sha256sum china-list.txt google-cn.txt apple-cn.txt gfw.txt greatfire.txt win-spy.txt win-update.txt win-extra.txt direct-list.txt proxy-list.txt reject-list.txt direct-tld-list.txt proxy-tld-list.txt reject-tld-list.txt || true
+          git add geoip.dat geosite.dat geoip.dat.sha256sum geosite.dat.sha256sum china-list.txt google-cn.txt apple-cn.txt gfw.txt greatfire.txt win-spy.txt win-update.txt win-extra.txt direct-list.txt proxy-list.txt reject-list.txt direct-tld-list.txt proxy-tld-list.txt reject-tld-list.txt fake-ip-filter.txt || true
           git commit -m "${{ env.RELEASE_NAME }}" || true
           git remote remove origin || true
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
