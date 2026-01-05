@@ -205,7 +205,7 @@ jobs:
       # 新增FakeIPFilter
       - name: Get and add fake-ip-filter domains into temp-fake-ip-filter.txt file
         run: |
-          curl -sSL $FAKE_IP_FILTER_URL | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' > fake_ip_filter.tmp
+          curl -sSL $FAKE_IP_FILTER_URL | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
           cat fake_ip_filter.tmp >> temp-fakeip.txt
           cat temp-fakeip.txt | sort --ignore-case -u > fake-ip-filter.txt
           [ -f "fake-ip-filter.txt" ] && cat fake-ip-filter.txt > ./community/data/fake-ip-filter
