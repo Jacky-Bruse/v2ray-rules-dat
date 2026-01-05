@@ -1,37 +1,100 @@
-sg-dr.intlgame.com
-sg.tdatamaster.com
-mgl.lobby.igamecj.com
-tdatamaster.com
-ig-us-sdkapi.igamecj.com
-totope.hwy.tcdnos.com
-f.totope.com
-totope.bytes.tcdnos.com
-k.gjacky.com
-graph.facebook.com
-cloudctrl.igamecj.com
-api.helpshift.com
-googleads.g.doubleclick.net
-android.crashsight.wetest.net
-app.adjust.com
-cloud.gsdk.proximabeta.com
-cloud.vmp.onezapp.com
-app.adjust.io
-dl.listdl.com
-ig-us-notice.igamecj.com
-dl.gjacky.com
-gameswhitelisted.googleapis.com
-games.googleapis.com
-android.googleapis.com
-asia.csoversea.mbgame.anticheatexpert.com
-gcloud.download.igamecj.com
-api.club.gpubgm.com
-appsflyersdk.com
-openai.com
-chatgpt.com
-adjust.world
-adjust.net.in
-intlgame.com
-iegcom.com
-asia.ngame.proximabeta.com
-proximabeta.com
-linux.do
+# 文件名示例：data/fake-ip-filter
+# 用途：编进 geosite.dat 后，在 mihomo 中用 geosite:fake-ip-filter 引用  :contentReference[oaicite:4]{index=4}
+
+# ===============================================================
+# 0) 引用已有集合（可选但推荐）
+# ===============================================================
+include:private
+include:connectivity-check
+
+# ===============================================================
+# 1) Windows NCSI 兜底（明确主机名）
+# ===============================================================
+full:www.msftconnecttest.com
+full:www.msftncsi.com
+full:dns.msftncsi.com
+# full:ipv6.msftconnecttest.com   # 可选：仅在你确有 IPv6 NCSI 异常时再启用
+
+# ===============================================================
+# 2) RTC / NAT 穿透（方案B核心增强）
+# ===============================================================
+# Nintendo Switch NAT 探测
+domain:srv.nintendo.net
+
+# PlayStation STUN
+domain:stun.playstation.net
+
+# Xbox Live / Teredo 相关
+regexp:^xbox\.[^.]+\.microsoft\.com$
+domain:xboxlive.com
+
+# 通用 WebRTC STUN（显式列全）
+full:stun.l.google.com
+full:stun1.l.google.com
+full:stun2.l.google.com
+full:stun3.l.google.com
+full:stun4.l.google.com
+full:stun.cloudflare.com
+full:stun.services.mozilla.com
+
+# ===============================================================
+# 3) 软件兼容性（本地回环）
+# ===============================================================
+full:localhost.ptlogin2.qq.com
+full:localhost.sec.qq.com
+
+# ===============================================================
+# 4) NTP 时间同步（少而准）
+# ===============================================================
+full:time.windows.com
+full:time.apple.com
+full:time.cloudflare.com
+full:time.nist.gov
+domain:pool.ntp.org
+
+# ===============================================================
+# 5) 你原始“Games / Arena”清单（保持原意：suffix 匹配用 domain:）
+# ===============================================================
+#NAME: Games
+domain:sg-dr.intlgame.com
+domain:sg.tdatamaster.com
+domain:mgl.lobby.igamecj.com
+domain:tdatamaster.com
+domain:ig-us-sdkapi.igamecj.com
+domain:totote.hwy.tcdnos.com
+domain:f.totope.com
+domain:totote.bytes.tcdnos.com
+domain:k.gjacky.com
+domain:graph.facebook.com
+domain:cloudctrl.igamecj.com
+domain:api.helpshift.com
+domain:googleads.g.doubleclick.net
+domain:android.crashsight.wetest.net
+domain:app.adjust.com
+domain:cloud.gsdk.proximabeta.com
+domain:cloud.vmp.onezapp.com
+domain:app.adjust.io
+domain:dl.listdl.com
+domain:ig-us-notice.igamecj.com
+domain:dl.gjacky.com
+domain:gameswhitelisted.googleapis.com
+domain:games.googleapis.com
+domain:android.googleapis.com
+domain:asia.csoversea.mbgame.anticheatexpert.com
+domain:gcloud.download.igamecj.com
+# IP-CIDR,119.28.33.29/32,no-resolve
+# ↑ 这是 IP 规则，不能放在 geosite 域名集合里；请放到 mihomo 的 rules 里单独写。
+domain:api.club.gpubgm.com
+domain:appsflyersdk.com
+domain:openai.com
+domain:chatgpt.com
+
+#Arena
+domain:adjust.world
+domain:adjust.net.in
+domain:intlgame.com
+domain:iegcom.com
+domain:asia.ngame.proximabeta.com
+domain:proximabeta.com
+
+domain:linux.do
