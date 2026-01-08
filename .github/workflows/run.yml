@@ -159,6 +159,16 @@ jobs:
           diff ./proxy-need-to-remove.txt ./proxy-list-without-redundant | awk '/^>/{print $2}' > temp-geolocation-\!cn.txt
           diff ./reject-need-to-remove.txt ./reject-list-without-redundant | awk '/^>/{print $2}' > temp-category-ads-all.txt
 
+      - name: Extract special rules from temp files to reserve files
+        run: |
+          # 从 temp-cn.txt 提取 keyword/full/regexp 规则追加到 direct-reserve.txt
+          grep -E '^(keyword:|full:|regexp:)' temp-cn.txt | grep -v '\(?' | sort --ignore-case -u >> direct-reserve.txt
+          # 从 temp-geolocation-!cn.txt 提取 keyword/full/regexp 规则追加到 proxy-reserve.txt
+          grep -E '^(keyword:|full:|regexp:)' temp-geolocation-\!cn.txt | grep -v '\(?' | sort --ignore-case -u >> proxy-reserve.txt
+          # 对 reserve 文件重新排序去重
+          sort --ignore-case -u direct-reserve.txt -o direct-reserve.txt
+          sort --ignore-case -u proxy-reserve.txt -o proxy-reserve.txt
+
       - name: Write lists to data directory
         run: |
           # Ensure directories exist
