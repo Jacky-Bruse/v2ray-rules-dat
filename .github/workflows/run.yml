@@ -67,8 +67,8 @@ jobs:
           
       - name: Get geoip.dat relative files
         run: |
-          wget https://github.com/Loyalsoldier/geoip/raw/release/geoip.dat
-          wget https://github.com/Loyalsoldier/geoip/raw/release/geoip.dat.sha256sum
+          wget --tries=3 --timeout=20 https://github.com/Loyalsoldier/geoip/raw/release/geoip.dat
+          wget --tries=3 --timeout=20 https://github.com/Loyalsoldier/geoip/raw/release/geoip.dat.sha256sum
 
       - name: Generate GFWList domains
         run: |
@@ -78,11 +78,13 @@ jobs:
 
       - name: Get and add direct domains into temp-direct.txt file
         run: |
-          curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > temp-direct.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > temp-direct.txt
+          [ -s temp-direct.txt ] || { echo "temp-direct.txt empty from CHINA_DOMAINS_URL"; exit 1; }
           # 处理 domain:xxx 格式：有点的直接输出，无点的转为 keyword:xxx
-          curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && do { $d=$1; print ($d =~ /\./ ? "$d\n" : "keyword:$d\n") }' >> temp-direct.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_DIRECT} | perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && do { $d=$1; print ($d =~ /\./ ? "$d\n" : "keyword:$d\n") }' >> temp-direct.txt
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${CHINA_DOMAINS_URL1} | grep -v '#' | sed -n 's/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/keyword:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/regexp:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/full:\1/p' > limbo_china_domains1.tmp
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CHINA_DOMAINS_URL1} | grep -v '#' | sed -n 's/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/keyword:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/regexp:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/full:\1/p' | grep -Ev '^regexp:.*\(\?' > limbo_china_domains1.tmp
+          [ -s limbo_china_domains1.tmp ] || { echo "limbo_china_domains1.tmp empty from CHINA_DOMAINS_URL1"; exit 1; }
           cat limbo_china_domains1.tmp | sort --ignore-case -u > limbo_china_domains_sorted1.tmp
           cat limbo_china_domains_sorted1.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
@@ -90,27 +92,32 @@ jobs:
           # cat limbo_china_domains2.tmp | sort --ignore-case -u > limbo_china_domains_sorted2.tmp
           # cat limbo_china_domains_sorted2.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
-          curl -sSL ${CHINA_DOMAINS_URL3} | sed -n 's/^[[:space:]]*-[[:space:]]*+\.\([^[:space:]]*\).*/\1/p' > limbo_china_domains3.tmp
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CHINA_DOMAINS_URL3} | sed -n 's/^[[:space:]]*-[[:space:]]*+\.\([^[:space:]]*\).*/\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/keyword:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/regexp:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/full:\1/p' | grep -Ev '^regexp:.*\(\?' > limbo_china_domains3.tmp
+          [ -s limbo_china_domains3.tmp ] || { echo "limbo_china_domains3.tmp empty from CHINA_DOMAINS_URL3"; exit 1; }
           cat limbo_china_domains3.tmp | sort --ignore-case -u > limbo_china_domains_sorted3.tmp
           cat limbo_china_domains_sorted3.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
+          [ -s temp-direct.txt ] || { echo "temp-direct.txt empty after direct sources"; exit 1; }
 
       - name: Get and add proxy domains into temp-proxy.txt file
         run: |
           cat ./gfwlist2dnsmasq/temp-gfwlist.txt | perl -ne '/^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/ && print "$1\n"' > temp-proxy.txt
-          curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
-          curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
           # 处理 domain:xxx 格式：有点的直接输出，无点的转为 keyword:xxx
-          curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && do { $d=$1; print ($d =~ /\./ ? "$d\n" : "keyword:$d\n") }' >> temp-proxy.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && do { $d=$1; print ($d =~ /\./ ? "$d\n" : "keyword:$d\n") }' >> temp-proxy.txt
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
           # 只提取 DOMAIN、DOMAIN-SUFFIX、DOMAIN-KEYWORD 规则，过滤掉 IP-CIDR、PROCESS-NAME 等非域名规则
-          curl -sSL ${CUSTOM_PROXY1} | grep -E '^(DOMAIN,|DOMAIN-SUFFIX,|DOMAIN-KEYWORD,)' | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' > limbo_proxy_domains1.tmp
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY1} | grep -E '^(DOMAIN,|DOMAIN-SUFFIX,|DOMAIN-KEYWORD,)' | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' > limbo_proxy_domains1.tmp
           cat limbo_proxy_domains1.tmp | sort --ignore-case -u > limbo_proxy_domains_sorted1.tmp
+          [ -s limbo_proxy_domains_sorted1.tmp ] || { echo "limbo_proxy_domains_sorted1.tmp empty from CUSTOM_PROXY1"; exit 1; }
           cat limbo_proxy_domains_sorted1.tmp >> temp-proxy.txt  # 注意这里使用>>而不是>
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
           # 只提取 DOMAIN、DOMAIN-SUFFIX、DOMAIN-KEYWORD 规则，过滤掉 IP-CIDR、PROCESS-NAME 等非域名规则
-          curl -sSL ${CUSTOM_PROXY2} | grep -E '^(DOMAIN,|DOMAIN-SUFFIX,|DOMAIN-KEYWORD,)' | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' > limbo_proxy_domains2.tmp
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY2} | grep -E '^(DOMAIN,|DOMAIN-SUFFIX,|DOMAIN-KEYWORD,)' | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' > limbo_proxy_domains2.tmp
           cat limbo_proxy_domains2.tmp | sort --ignore-case -u > limbo_proxy_domains_sorted2.tmp
+          [ -s limbo_proxy_domains_sorted2.tmp ] || { echo "limbo_proxy_domains_sorted2.tmp empty from CUSTOM_PROXY2"; exit 1; }
           cat limbo_proxy_domains_sorted2.tmp >> temp-proxy.txt  # 注意这里使用>>而不是>
+          [ -s temp-proxy.txt ] || { echo "temp-proxy.txt empty after proxy sources"; exit 1; }
 
       - name: Get and add reject domains into temp-reject.txt file
         run: |
@@ -125,8 +132,8 @@ jobs:
       - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         run: |
           # 过滤掉包含 Go 不支持的 Perl 正则语法 (?! (?## (?< 等
-          curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v '\(?' | sort --ignore-case -u > direct-reserve.txt
-          curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v '\(?' | sort --ignore-case -u > proxy-reserve.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_DIRECT} | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v '\(?' | sort --ignore-case -u > direct-reserve.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v '\(?' | sort --ignore-case -u > proxy-reserve.txt
 
       - name: Add proxy, direct and reject domains from "hidden" branch to appropriate temp files
         run: |
@@ -159,9 +166,15 @@ jobs:
 
       - name: Remove domains from "need-to-remove" lists in "hidden" branch
         run: |
-          diff ./direct-need-to-remove.txt ./direct-list-without-redundant | awk '/^>/{print $2}' > temp-cn.txt
-          diff ./proxy-need-to-remove.txt ./proxy-list-without-redundant | awk '/^>/{print $2}' > temp-geolocation-\!cn.txt
-          diff ./reject-need-to-remove.txt ./reject-list-without-redundant | awk '/^>/{print $2}' > temp-category-ads-all.txt
+          sort --ignore-case -u ./direct-need-to-remove.txt > ./direct-need-to-remove-sorted.txt
+          sort --ignore-case -u ./proxy-need-to-remove.txt > ./proxy-need-to-remove-sorted.txt
+          sort --ignore-case -u ./reject-need-to-remove.txt > ./reject-need-to-remove-sorted.txt
+          sort --ignore-case -u ./direct-list-without-redundant > ./direct-list-without-redundant-sorted.txt
+          sort --ignore-case -u ./proxy-list-without-redundant > ./proxy-list-without-redundant-sorted.txt
+          sort --ignore-case -u ./reject-list-without-redundant > ./reject-list-without-redundant-sorted.txt
+          diff ./direct-need-to-remove-sorted.txt ./direct-list-without-redundant-sorted.txt | awk '/^>/{print $2}' > temp-cn.txt
+          diff ./proxy-need-to-remove-sorted.txt ./proxy-list-without-redundant-sorted.txt | awk '/^>/{print $2}' > temp-geolocation-\!cn.txt
+          diff ./reject-need-to-remove-sorted.txt ./reject-list-without-redundant-sorted.txt | awk '/^>/{print $2}' > temp-category-ads-all.txt
 
       - name: Extract special rules from temp files to reserve files
         run: |
@@ -203,28 +216,36 @@ jobs:
 
       - name: Create `china-list`、`google-cn`、`apple-cn`、`gfw`、`greatfire` lists
         run: |
-          curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > ./community/data/china-list
-          curl -sSL $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > china-list.txt
-          curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > ./community/data/google-cn
-          curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > google-cn.txt
-          curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > ./community/data/apple-cn
-          curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > apple-cn.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > ./community/data/china-list
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > china-list.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > ./community/data/google-cn
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > google-cn.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > ./community/data/apple-cn
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > apple-cn.txt
           cat ./gfwlist2dnsmasq/temp-gfwlist.txt | perl -ne '/^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/ && print "$1\n"' >> ./community/data/gfw
           cat ./community/data/gfw | sort --ignore-case -u > gfw.txt
           cat ./community/data/greatfire | sort --ignore-case -u > greatfire.txt
-          curl -sSL $WIN_SPY | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-spy
-          curl -sSL $WIN_SPY | grep "0.0.0.0" | awk '{print $2}' > win-spy.txt
-          curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-update
-          curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > win-update.txt
-          curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-extra
-          curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > win-extra.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $WIN_SPY | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-spy
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $WIN_SPY | grep "0.0.0.0" | awk '{print $2}' > win-spy.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-update
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > win-update.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-extra
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > win-extra.txt
 
       # 新增FakeIPFilter
       - name: Get and add fake-ip-filter domains into temp-fake-ip-filter.txt file
         run: |
-          curl -sSL $FAKE_IP_FILTER_URL | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $FAKE_IP_FILTER_URL | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' | grep -v '^#' | grep -v '^$' > fake_ip_filter.tmp
+          [ -s fake_ip_filter.tmp ] || { echo "fake_ip_filter.tmp empty from FAKE_IP_FILTER_URL"; exit 1; }
           cat fake_ip_filter.tmp >> temp-fakeip.txt
-          cat temp-fakeip.txt | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | grep -v '^#' | grep -v '^$' | sort --ignore-case -u > fake-ip-filter.txt
+          cat temp-fakeip.txt | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | grep -v '^#' | grep -v '^$' > fake-ip-filter-all.txt
+          grep -E '^(full:|keyword:|regexp:)' fake-ip-filter-all.txt | sort --ignore-case -u > fake-ip-filter-prefixed.txt
+          grep -Ev '^(full:|keyword:|regexp:)' fake-ip-filter-all.txt | sort --ignore-case -u > fake-ip-filter-domains.txt
+          ./findRedundantDomain.py ./fake-ip-filter-domains.txt ./fake-ip-filter-deleted-unsort
+          [ ! -f "fake-ip-filter-deleted-unsort" ] && touch fake-ip-filter-deleted-unsort
+          sort ./fake-ip-filter-deleted-unsort > ./fake-ip-filter-deleted-sort
+          diff ./fake-ip-filter-deleted-sort ./fake-ip-filter-domains.txt | awk '/^>/{print $2}' > ./fake-ip-filter-domains-without-redundant
+          cat fake-ip-filter-domains-without-redundant fake-ip-filter-prefixed.txt | sort --ignore-case -u > fake-ip-filter.txt
           [ -f "fake-ip-filter.txt" ] && cat fake-ip-filter.txt > ./community/data/fake-ip-filter
 
       - name: Build geosite.dat file
