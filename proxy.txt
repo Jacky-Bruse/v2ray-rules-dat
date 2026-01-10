@@ -17,10 +17,8 @@ wiktionary.org
 ai.google.dev
 alkalimakersuite-pa.clients6.google.com
 makersuite.google.com
-bard.google.com
 deepmind.com
 deepmind.google
-gemini.google.com
 generativeai.google
 proactivebackend-pa.googleapis.com
 apis.google.com
@@ -32,7 +30,6 @@ orz-7.com
 hinet.net
 ofiii.com
 googlevideo.com
-youtube.com
 mytvsuper.com
 mgl.lobby.igamecj.com
 tdatamaster.com
@@ -43,7 +40,6 @@ totope.bytes.tcdnos.com
 k.gjacky.com
 modules-cloudflare.lsposed.org
 community.oneplus.com
-groq.com
 ipgeolocation.io
 api.ipgeolocation.io
 adjust.world
@@ -58,6 +54,7 @@ linux.do
 metacubex.one
 dmit.io
 live.fanmingming.com
+modules.lsposed.org
 lsposed.org
 mail.xixihub.com
 gauss-componentotacostmanual-eu.allawnofs.com
@@ -69,4 +66,3 @@ gvt1.com
 gvt2.com
 gvt3.com
 dl.google.com
-
