@@ -197,22 +197,25 @@ jobs:
           grep -E '^(keyword:|full:|regexp:)' temp-cn.txt | grep -v '\(?' | sort --ignore-case -u >> direct-reserve.txt
           # 从 temp-geolocation-!cn.txt 提取 keyword/full/regexp 规则追加到 proxy-reserve.txt
           grep -E '^(keyword:|full:|regexp:)' temp-geolocation-\!cn.txt | grep -v '\(?' | sort --ignore-case -u >> proxy-reserve.txt
+          # 从 temp-category-ads-all.txt 提取 keyword/full/regexp 规则追加到 reject-reserve.txt
+          grep -E '^(keyword:|full:|regexp:)' temp-category-ads-all.txt | grep -v '\(?' | sort --ignore-case -u >> reject-reserve.txt
           # 对 reserve 文件重新排序去重
           sort --ignore-case -u direct-reserve.txt -o direct-reserve.txt
           sort --ignore-case -u proxy-reserve.txt -o proxy-reserve.txt
+          sort --ignore-case -u reject-reserve.txt -o reject-reserve.txt
 
       - name: Write lists to data directory
         run: |
           # Ensure directories exist
           mkdir -p ./community/data
 
-          cat temp-cn.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/cn
+          cat temp-cn.txt | sort --ignore-case -u | grep -Ev '^(keyword:|full:|regexp:)' | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/cn
           # 生成 tld-list 时排除 keyword/full/regexp 规则（这些会通过 reserve 文件纳入 geosite）
           cat temp-cn.txt | sort --ignore-case -u | grep -Ev '^(keyword:|full:|regexp:)' | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > direct-tld-list.txt
-          cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/geolocation-\!cn
+          cat temp-geolocation-\!cn.txt | sort --ignore-case -u | grep -Ev '^(keyword:|full:|regexp:)' | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/geolocation-\!cn
           # 生成 tld-list 时排除 keyword/full/regexp 规则（这些会通过 reserve 文件纳入 geosite）
           cat temp-geolocation-\!cn.txt | sort --ignore-case -u | grep -Ev '^(keyword:|full:|regexp:)' | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > proxy-tld-list.txt
-          cat temp-category-ads-all.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/category-ads-all
+          cat temp-category-ads-all.txt | sort --ignore-case -u | grep -Ev '^(keyword:|full:|regexp:)' | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' > ./community/data/category-ads-all
           # 生成 tld-list 时排除 keyword/full/regexp 规则（这些会通过 reserve 文件纳入 geosite）
           cat temp-category-ads-all.txt | sort --ignore-case -u | grep -Ev '^(keyword:|full:|regexp:)' | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > reject-tld-list.txt
           
