@@ -147,8 +147,8 @@ jobs:
       - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         run: |
           # 过滤掉包含 Go 不支持的 Perl 正则语法 (?! (?## (?< 等
-          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_DIRECT} | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v '\(?' | sort --ignore-case -u > direct-reserve.txt
-          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v '\(?' | sort --ignore-case -u > proxy-reserve.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_DIRECT} | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v -F '(?' | sort --ignore-case -u > direct-reserve.txt
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | grep -v -F '(?' | sort --ignore-case -u > proxy-reserve.txt
 
       - name: Add proxy, direct and reject domains from "hidden" branch to appropriate temp files
         run: |
@@ -194,11 +194,11 @@ jobs:
       - name: Extract special rules from temp files to reserve files
         run: |
           # 从 temp-cn.txt 提取 keyword/full/regexp 规则追加到 direct-reserve.txt
-          grep -E '^(keyword:|full:|regexp:)' temp-cn.txt | grep -v '\(?' | sort --ignore-case -u >> direct-reserve.txt
+          grep -E '^(keyword:|full:|regexp:)' temp-cn.txt | grep -v -F '(?' | sort --ignore-case -u >> direct-reserve.txt
           # 从 temp-geolocation-!cn.txt 提取 keyword/full/regexp 规则追加到 proxy-reserve.txt
-          grep -E '^(keyword:|full:|regexp:)' temp-geolocation-\!cn.txt | grep -v '\(?' | sort --ignore-case -u >> proxy-reserve.txt
+          grep -E '^(keyword:|full:|regexp:)' temp-geolocation-\!cn.txt | grep -v -F '(?' | sort --ignore-case -u >> proxy-reserve.txt
           # 从 temp-category-ads-all.txt 提取 keyword/full/regexp 规则追加到 reject-reserve.txt
-          grep -E '^(keyword:|full:|regexp:)' temp-category-ads-all.txt | grep -v '\(?' | sort --ignore-case -u >> reject-reserve.txt
+          grep -E '^(keyword:|full:|regexp:)' temp-category-ads-all.txt | grep -v -F '(?' | sort --ignore-case -u >> reject-reserve.txt
           # 对 reserve 文件重新排序去重
           sort --ignore-case -u direct-reserve.txt -o direct-reserve.txt
           sort --ignore-case -u proxy-reserve.txt -o proxy-reserve.txt
