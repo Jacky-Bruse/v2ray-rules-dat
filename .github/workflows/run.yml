@@ -29,6 +29,7 @@ jobs:
           echo "CHINA_DOMAINS_URL1=https://github.com/Accademia/Additional_Rule_For_Clash/raw/refs/heads/main/China/China.yaml" >> $GITHUB_ENV
           # echo "CHINA_DOMAINS_URL2=https://gist.githubusercontent.com/cnfree8964/0864fd1d2e88936a095fb40d74ce4993/raw/collection.yaml" >> $GITHUB_ENV
           echo "CHINA_DOMAINS_URL3=https://github.com/Sfssup/MihomoConfigFile/raw/refs/heads/main/rule_set/direct.yaml" >> $GITHUB_ENV
+          echo "CHINA_DOMAINS_URL4=https://github.com/blackmatrix7/ios_rule_script/raw/refs/heads/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP.list" >> $GITHUB_ENV
           # 新增代理
           echo "CUSTOM_PROXY1=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/Global/Global.list" >> $GITHUB_ENV
           echo "CUSTOM_PROXY2=https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/GlobalMedia/GlobalMedia.list" >> $GITHUB_ENV
@@ -96,6 +97,20 @@ jobs:
           [ -s limbo_china_domains3.tmp ] || { echo "limbo_china_domains3.tmp empty from CHINA_DOMAINS_URL3"; exit 1; }
           cat limbo_china_domains3.tmp | sort --ignore-case -u > limbo_china_domains_sorted3.tmp
           cat limbo_china_domains_sorted3.tmp >> temp-direct.txt  # 注意这里使用>>而不是>
+          # Add ChinaMaxNoIP direct domains (DOMAIN / DOMAIN-SUFFIX / DOMAIN-KEYWORD)
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CHINA_DOMAINS_URL4} | awk -F, '{
+            if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next;
+            type=$1; value=$2;
+            gsub(/^[ \t]+|[ \t]+$/, "", value);
+            sub(/[ \t]*#.*$/, "", value);
+            if (value == "") next;
+            if (type=="DOMAIN") print "full:" value;
+            else if (type=="DOMAIN-SUFFIX") print value;
+            else if (type=="DOMAIN-KEYWORD") print "keyword:" value;
+          }' > limbo_china_domains4.tmp
+          [ -s limbo_china_domains4.tmp ] || { echo "limbo_china_domains4.tmp empty from CHINA_DOMAINS_URL4"; exit 1; }
+          cat limbo_china_domains4.tmp | sort --ignore-case -u > limbo_china_domains_sorted4.tmp
+          cat limbo_china_domains_sorted4.tmp >> temp-direct.txt
           [ -s temp-direct.txt ] || { echo "temp-direct.txt empty after direct sources"; exit 1; }
 
       - name: Get and add proxy domains into temp-proxy.txt file
