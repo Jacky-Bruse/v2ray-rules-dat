@@ -47,3 +47,10 @@
   asia.ngame.proximabeta.com
   proximabeta.com
   linux.do
+
+generativelanguage.googleapis.com
+texttospeech.googleapis.com
+translate.googleapis.com
+googleapis.com
+*.googleapis.com
+
