@@ -92,9 +92,9 @@ jobs:
           curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $CHINA_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' > china-list.txt
           cp china-list.txt temp-direct.txt
           [ -s temp-direct.txt ] || { echo "temp-direct.txt empty from CHINA_DOMAINS_URL"; exit 1; }
-          # 处理 domain:xxx 格式：有点的直接输出，无点的转为 keyword:xxx
+          # 无点的 domain:xxx 是顶级域（cn、yun 等），按后缀输出；转成 keyword 会按子串匹配，误伤 cnn.com 等
           curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_DIRECT} > custom-direct.tmp
-          perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && do { $d=$1; print ($d =~ /\./ ? "$d\n" : "keyword:$d\n") }' custom-direct.tmp >> temp-direct.txt
+          perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && print "$1\n"' custom-direct.tmp >> temp-direct.txt
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
           curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CHINA_DOMAINS_URL1} | grep -v '#' | sed -n 's/^[[:space:]]*-[[:space:]]*DOMAIN-SUFFIX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-KEYWORD[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/keyword:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN-REGEX[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/regexp:\1/p; s/^[[:space:]]*-[[:space:]]*DOMAIN[[:space:]]*,[[:space:]]*\([^[:space:]]*\).*/full:\1/p' | grep -Ev '^regexp:.*\(\?' > limbo_china_domains1.tmp
           [ -s limbo_china_domains1.tmp ] || { echo "limbo_china_domains1.tmp empty from CHINA_DOMAINS_URL1"; exit 1; }
@@ -132,9 +132,9 @@ jobs:
           sed 's/^full://' google-cn.txt >> temp-proxy.txt
           curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > apple-cn.txt
           sed 's/^full://' apple-cn.txt >> temp-proxy.txt
-          # 处理 domain:xxx 格式：有点的直接输出，无点的转为 keyword:xxx
+          # 无点的 domain:xxx 是顶级域，按后缀输出，理由同上
           curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY} | grep -Ev ":@cn" > custom-proxy.tmp
-          perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && do { $d=$1; print ($d =~ /\./ ? "$d\n" : "keyword:$d\n") }' custom-proxy.tmp >> temp-proxy.txt
+          perl -ne '/^domain:([^:]+)(\n$|:@.+)/ && print "$1\n"' custom-proxy.tmp >> temp-proxy.txt
            # 新增对LIMBO_ADBLOCK_RULES_URL 的处理，以下三行为一组
           # 只提取 DOMAIN、DOMAIN-SUFFIX、DOMAIN-KEYWORD、DOMAIN-REGEX 规则，过滤掉 IP-CIDR、PROCESS-NAME 等非域名规则
           curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 ${CUSTOM_PROXY1} | grep -E '^(DOMAIN,|DOMAIN-SUFFIX,|DOMAIN-KEYWORD,|DOMAIN-REGEX,)' | sed -e 's/^DOMAIN,/full:/' -e 's/^DOMAIN-SUFFIX,//' -e 's/^DOMAIN-KEYWORD,/keyword:/' -e 's/^DOMAIN-REGEX,/regexp:/' | grep -Ev '^regexp:.*\(\?' > limbo_proxy_domains1.tmp
